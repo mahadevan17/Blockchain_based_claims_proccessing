@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Medical_claims.sol": "Approval"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Medical_claims.sol": {
+			"keccak256": "0x2b486731e27d22d37e9c5976c8aef07f40a7e196684239b139f443d7c5296118",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f6d5b23f78fbd24f83005601189759847117c05e775f9bf6a7052cc55ade3f5a",
+				"dweb:/ipfs/QmSvx1ZKVJnhrGwYQbjZVe2NeEQE6GtjEGdsNPrq9xD61Y"
+			]
+		}
+	},
+	"version": 1
+}
