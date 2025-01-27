@@ -11,19 +11,29 @@ contract Registration{
         //mapping(address->uint) Pharmacy;
 
 
+    //modifiers
+
+
+
+    //events
+    event PhysicianRegistered();
+    event InsuranceCompanyRegistered();
+    event PharmacyRegistered();
+    event patientRegistered();
+
     //The functions
 
     //PhysicianRegistration : to register physician using there address
     function PhysicianRegistration(address){}
 
     //InsuaranceCompanyRegistration : to register Insurance Comany using it's address
-    function InsuranceCompanyRegistration(){}
+    function InsuranceCompanyRegistration(address){}
     
     //PharmacyRegistration: to register pharmacy using it's addresss
     function PharmacyRegistration(address){}
 
     //patientRegistration: to register patient using their Address
-    function patientRegister(address){}
+    function Register(address){}
 
 }
 
@@ -33,10 +43,10 @@ contract Approval{
     //the variables
 
     bytes32 IPFShash;
-    enum AprovalRequestState;//give dict    
-    enum InsuranceApprovalState;//give dict
-    enum MedicineCollectionState;//give dict
-    enum PayementState;//give dict
+    enum AprovalRequestState{Pending,Approved}  
+    enum InsuranceApprovalState{Pending,Approved,Rejected}
+    enum MedicineCollectionState{ReadyForCollection,Collected}
+    enum PayementState{pending,paid}
     uint Patient_ID;
     uint Drug1CRN;
     uint Drug2CRN;
@@ -44,6 +54,20 @@ contract Approval{
     uint MedicationInvoice_ID;
     Uint DrugTotalCost;
     uint PaidAmount;
+
+    //modifiers
+
+
+    //events
+
+    event PresciptionCreated();
+    event PharmacyApprovalStateChanged();
+    event RequestInsuranceApprovalStateChanged();
+    event InsuranceApprovalStateChanged();
+    event MedicationPreperationStateChanged();
+    event MedicationCollected();
+    event PaymentRequested();
+    event PaymentClaimed();
 
     //functions to implement
 
@@ -60,7 +84,7 @@ contract Approval{
     function RequestInsuranceApproval(uint,uint,uint,uint){}
 
     //InsuranceApproval
-    function InsuranceApproval(enum,address,uint){}
+    function InsuranceApproval(enum InsuranceApprovalState,address,uint){}
 
     //MediacationPreparation
     function MedicationPreperation(uint){}
