@@ -4,36 +4,58 @@ pragma solidity ^0.8.15;
 
 contract Registration{
     //the variables
-    address regiulatory_authority;
-        //mapping(address->uint) Patient;
-        //mapping(address->uint) Insurance_Comapny;
-        //mapping(address->uint) Phycisian;
-        //mapping(address->uint) Pharmacy;
+    address public regulatory_authority;
+
+    mapping(address=>bool) public patients;
+    mapping(address=>bool) public insuranceCompanies;
+    mapping(address=>bool) public physicians;
+    mapping(address=>bool) public pharmacies;
 
 
     //modifiers
-
+    modifier OnlyRegulatoryAuthority(){
+        require(msg.sender==regulatory_authority,"Only regulatory authority can register");
+        _;
+    }
 
 
     //events
-    event PhysicianRegistered();
-    event InsuranceCompanyRegistered();
-    event PharmacyRegistered();
-    event patientRegistered();
+    event PhysicianRegistered(address indexed physician);
+    event InsuranceCompanyRegistered(address indexed insuranceCompany);
+    event PharmacyRegistered(address indexed pharmacy);
+    event PatientRegistered(address indexed patient);
 
     //The functions
 
     //PhysicianRegistration : to register physician using there address
-    function PhysicianRegistration(address)internal{}
+    function PhysicianRegistration(address _Physician) OnlyRegulatoryAuthority external {
+        require(!insuranceCompanies[_Physician], "Physician already registered");
+        physicians[_Physician] = true;
+        emit InsuranceCompanyRegistered(_Physician);
+
+    }
 
     //InsuaranceCompanyRegistration : to register Insurance Comany using it's address
-    function InsuranceCompanyRegistration(address)internal {}
+    function InsuranceCompanyRegistration(address _insuranceCompany) OnlyRegulatoryAuthority external {
+        require(!insuranceCompanies[_insuranceCompany], "Insurance company already registered");
+        insuranceCompanies[_insuranceCompany] = true;
+        emit InsuranceCompanyRegistered(_insuranceCompany);
+    }
     
     //PharmacyRegistration: to register pharmacy using it's addresss
-    function PharmacyRegistration(address)internal{}
+    function PharmacyRegistration(address _pharmacy) OnlyRegulatoryAuthority external{
+        require(!pharmacies[_pharmacy], "Pharmacy already registered");
+        pharmacies[_pharmacy] = true;
+        emit PharmacyRegistered(_pharmacy);
+
+    }
 
     //patientRegistration: to register patient using their Address
-    function Register(address)internal{}
+    function PatientRegister(address _patient) OnlyRegulatoryAuthority external{
+        require(!patients[_patient], "Patient already registered");
+        patients[_patient] = true;
+        emit PatientRegistered(_patient);
+    }
 
 }
 
@@ -41,6 +63,10 @@ contract Registration{
 contract Approval{
 
     //the variables
+
+    Registration reg;
+
+
 
     bytes32 IPFShash;
     enum AprovalRequestState{Pending,Approved}  
@@ -58,6 +84,10 @@ contract Approval{
 
     //constructor
 
+    constructor(address _reg_contract_address) {
+        reg = Registration(_reg_contract_address);
+    }
+
     /*constructor(){
         for(int i=0;i<5;i++){
             //All patients selections values must be zero initially
@@ -67,22 +97,22 @@ contract Approval{
 
     //modifiers
     modifier OnlyPhysician(){
-        require(msg.sender==Physician,"Only Physician can create Prescription");
+        require(msg.sender==reg.Physician,"Only Physician can create Prescription");
         _;
     }
 
     modifier OnlyPatient(){
-        require(msg.sender==Patient,"Only Patient is allwoed to select pharmacies");
+        require(msg.sender==reg.Patient,"Only Patient is allwoed to select pharmacies");
         _;
     }
 
     modifier OnlyPharmacy(){
-        require(msg.sender==Pharmacy,"Only registered pharmacies is allowed");
+        require(msg.sender==reg.Pharmacy,"Only registered pharmacies is allowed");
         _;
     }
 
     modifier OnlyInsuranceCompany(){
-        require(msg.sender==InsuranceCompany,"Only Insurance company can call this function");
+        require(msg.sender==reg.InsuranceCompany,"Only Insurance company can call this function");
         _;
     }
 
