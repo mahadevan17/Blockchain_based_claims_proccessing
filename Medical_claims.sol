@@ -168,8 +168,9 @@ contract Approval{
     }
 
     //InsuranceApproval
-    function InsuranceApproval(InsuranceApprovalState,address,uint )OnlyInsuranceCompany external{
+    function InsuranceApproval(InsuranceApprovalState,address,uint ) OnlyInsuranceCompany external{
         require(InsuranceApprovalState==Pending,"Request already proccessed");
+        InsuranceApprovalState.Pending
         /*  ifApprovalRequestState Approvedthen
     Emitaneventdeclaringthatprescriptionhas
     beenapproved
