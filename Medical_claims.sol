@@ -121,7 +121,7 @@ contract Approval{
 
     //events
 
-    event PresciptionCreated(address indexed Physician, uint PatientID,bytes32 _IPFShash );
+    event PresciptionCreated(address indexed Physician, uint PatientID,bytes32 IPFShash );
     event PharmacyApprovalStateChanged();
     event PharmacySelected(address indexed,uint);
     event RequestInsuranceApprovalStateChanged();
