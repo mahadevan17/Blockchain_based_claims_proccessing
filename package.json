@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "ethers": "^6.13.5",
+    "express": "^4.21.2",
+    "glob": "^11.0.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.10",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.7",
+    "hardhat": "^2.22.19",
+    "hardhat-deploy": "^0.14.1"
+  }
+}
