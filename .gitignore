@@ -1,1 +1,4 @@
-machineLearning/.ipynb_checkpoints
+machineLearning/.ipynb_checkpoints/
+node_modules
+artifacts
+cache
