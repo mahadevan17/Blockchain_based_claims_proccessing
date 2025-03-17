@@ -1094,12 +1094,14 @@ async function Claimpayment(value) {
   try{
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
-    
+
+    let amt=await ApprovalContract.methods.DrugTotalCost().call()
+
     if (!selectedAccount) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount , value: amt });
   console.log('Payment claim successful.');
   alert( 'Payment claim successful.');
   }catch(error){
@@ -1221,7 +1223,7 @@ document.getElementById('medicinecollect').addEventListener('click',()=>{
   medicine_collection(patientid);});
 
 //request payment
-document.getElementById('requestpayment').addEventListener('click',()=>{
+document.getElementById('paymentrequest').addEventListener('click',()=>{
   let invoiceid=document.getElementById('medicineinvoiceid').value;
   let totalcost=document.getElementById('medicinecost').value;
   requestpayment(invoiceid,totalcost) });
@@ -1229,5 +1231,4 @@ document.getElementById('requestpayment').addEventListener('click',()=>{
 //claim payment
 document.getElementById('paymentclaim').addEventListener('click',()=>{
   let  invoiceid=document.getElementById('medicineinvoice_id').value;
-
   Claimpayment(invoiceid)});
