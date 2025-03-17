@@ -994,7 +994,7 @@ async function PharmacyApproval(value) {
 
 }
 
-async function InsuranceApprovalRequest(value) {
+async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1003,7 +1003,7 @@ async function InsuranceApprovalRequest(value) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.RequestInsuranceApproval(patientID,drug1,drug2,drug3).send({ from: selectedAccount });
   console.log( 'Insurance approval request successful.');
   alert('Insurance approval request successful.');
 
@@ -1022,7 +1022,7 @@ async function InsuranceApproval(pharmacyid,patientid) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: selectedAccount});
+  await ApprovalContract.methods.InsuranceApproval(1,pharmacyid,patientid).send({ from: selectedAccount});
   console.log('Insurance approval successful.');
   alert( 'Insurance approval successful.');
 
@@ -1041,7 +1041,7 @@ async function medicine_preparation(value) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.MedicationPreparetion(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.MedicationPreparation(value).send({ from: selectedAccount });
   console.log('Medication preparation successful.');
   alert('Medication preparation successful.')
   } catch (error) {
@@ -1185,7 +1185,9 @@ document.getElementById('createpresciption').addEventListener('click', () => {
 
   //pharmacy selection********************************
 
-  //document.getElementById('Pharmacy_Registration').addEventListener('click', PharmaciesRegistration);
+  document.getElementById('select-pharmacy').addEventListener('click', () => {
+      let pharma_id=document.getElementById('pharmacy_id').value;
+      PharmacySelection(pharma_id);});
 
   //pharmacy approval
   document.getElementById('approvepharmacy').addEventListener('click', () => {
@@ -1207,7 +1209,7 @@ document.getElementById('approval').addEventListener('click', () => {
   InsuranceApproval(pharmacyid,patientID) });
 
 // medicine preparation
-document.getElementById('preparemedicine').addEventListener('click',()=>{
+document.getElementById('preparemedicine').addEventListener('click', () => {
   let patientid=document.getElementById('patientId').value;
 
   medicine_preparation(patientid);});
