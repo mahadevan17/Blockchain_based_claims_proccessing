@@ -40,6 +40,8 @@
     Drug Code 2&nbsp;<input id="Drug2" type="text" placeholder="Drug Code 2"><br>
     Drug Code 3&nbsp;<input id="Drug3" type="text" placeholder="Drug Code 3"><br>
     <button id="createpresciption">Create Presciption</button>
+    <p id="ipfs-status"></p>
+    <p><strong>IPFS CID:</strong> <span id="ipfsHash"></span></p>
    </div>
 
    <hr>
@@ -48,6 +50,9 @@
    <div id="pharmacyselection">
     <h3>ONLY PATIENT | PHARMACY SELECTION</h3>
     <input id="pharmacy_id" type="text" placeholder="Pharmacy ID">
+    <label>Select Pharmacy:</label>
+    <select id="pharmacyDropdown"></select>
+    <button onclick="PharmacySelection()">Select Pharmacy</button>
 
    </div>
    <hr>
