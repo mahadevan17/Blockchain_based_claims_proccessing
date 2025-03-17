@@ -1,4 +1,12 @@
 machineLearning/.ipynb_checkpoints/
+machineLearning\Test_Beneficiarydata.csv
+machineLearning\Test_Inpatientdata.csv
+machineLearning\Test_Outpatientdata.csv
+machineLearning\Test.csv
+machineLearning\Train_Beneficiarydata.csv
+machineLearning\Train_Inpatientdata.csv
+machineLearning\Train_Outpatientdata.csv
+machineLearning\Train.csv
 node_modules
 artifacts
 cache
