@@ -1130,7 +1130,7 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   };
 
   const metadata = {
-    name: `Prescription_${patientName}`, 
+    name: `Prescription_${patientid}`, 
   };
 
   const pinataBody = {
