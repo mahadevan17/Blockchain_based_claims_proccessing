@@ -10,4 +10,4 @@ machineLearning/Train.csv
 node_modules
 artifacts
 cache
-ignition\deployments
+ignition/deployments
