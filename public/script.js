@@ -1129,6 +1129,15 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
     timestamp: new Date().toISOString() // Adds a timestamp for record keeping
   };
 
+  const metadata = {
+    name: `Prescription_${patientName}`, 
+  };
+
+  const pinataBody = {
+    pinataContent: jsonData,
+    pinataMetadata: metadata // Add filename metadata
+  };
+
   document.getElementById("ipfs-status").innerText = "Uploading...";
 
   try {
@@ -1139,7 +1148,7 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
         "pinata_api_key": API_KEY,
         "pinata_secret_api_key": API_SECRET
       },
-      body: JSON.stringify(jsonData)
+      body: JSON.stringify(pinataBody),
     });
 
     let data = await response.json();
