@@ -179,10 +179,12 @@ contract Approval {
 
         Patient_ID = patient_;
         if (_insApproval == InsuranceApprovalState.Approved){
+            InsuranceApprovalstate = InsuranceApprovalState.Approved;
             emit RequestApproval(msg.sender, 1 ,Patient_ID, address(_Pharmacy) );
         }
 
         if (_insApproval == InsuranceApprovalState.Rejected){
+            InsuranceApprovalstate = InsuranceApprovalState.Rejected;
             emit RequestRejection(msg.sender, 2 , Patient_ID, address(_Pharmacy));
         }
 
