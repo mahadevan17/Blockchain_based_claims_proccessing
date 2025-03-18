@@ -11,3 +11,4 @@ node_modules
 artifacts
 cache
 ignition\deployments\chain-31337\journal.jsonl
+ignition\deployments\chain-31337\deployed_addresses.json
