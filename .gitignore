@@ -11,4 +11,4 @@ node_modules
 artifacts
 cache
 ignition/deployments
-public/.env
+.env
