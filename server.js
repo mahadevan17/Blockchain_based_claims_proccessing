@@ -12,6 +12,8 @@ app.use(express.static(path.join(__dirname,'public')));
 app.get("/config", (req, res) => {
     res.json({ API_KEY: process.env.PINATA_API_KEY ,
         API_SECRET: process.env.PINATA_API_SECRET ,
+        API_GATEWAY:process.env.PINATA_API_GATEWAY ,
+
     });
   });
 
