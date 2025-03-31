@@ -1,5 +1,20 @@
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
+let API_KEY;
+let API_SECRET;
+
+fetch("/config")
+  .then((response) => response.json())
+  .then((config) => {
+
+    API_KEY = config.API_KEY; 
+    API_SECRET = config.API_SECRET;
+
+    console.log("API Key from Server:", API_KEY);
+    console.log("API SECRET from Server:", API_SECRET);
+  })
+  .catch((error) => console.error("Error fetching config:", error));
+
 //*************************THERE ARE TWO CONTRACTS SO NEED TO INITIALIZE 2 CONTRACTS ************************************/
 // Replace with your deployed contract's ABI and address
 const Registration_contractABI = [{
@@ -963,7 +978,6 @@ async function PharmacySelection(value) {
       alert('Please select an account first.');
       return;
     }
-    //const pharmacies = await RegistrationContract.pharmacies().call();
 
   await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: selectedAccount });
   console.log('Pharmacy selection successful.');
@@ -1113,8 +1127,12 @@ async function Claimpayment(value) {
 //for ipfs uploading 
 
 async function uploadToIPFS(patientid, drug1, drug2, drug3) {
-  const API_KEY = "01944b57d037e5411bd6";  
-  const API_SECRET = "152cadd93c32f2fe5f33ea96466ae21874a66bab5e6d5c4003d987a38a7389ea";  // Replace with your Pinata Secret Key
+  //const API_KEY = process.env.API_KEY;  
+  //const API_SECRET = process.env.API_SECRET;
+  if (!API_KEY || !API_SECRET) {
+    console.error("API keys are not loaded yet!");
+    return;
+  }
 
   if (!patientid || !drug1 || !drug2 || !drug3) {
     alert("Please fill in all fields!");
