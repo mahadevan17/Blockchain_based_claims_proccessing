@@ -2,6 +2,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 let API_KEY;
 let API_SECRET;
+let API_GATEWAY;
 
 fetch("/config")
   .then((response) => response.json())
@@ -9,9 +10,11 @@ fetch("/config")
 
     API_KEY = config.API_KEY; 
     API_SECRET = config.API_SECRET;
-
+    API_GATEWAY = config.API_GATEWAY;
+    
     console.log("API Key from Server:", API_KEY);
     console.log("API SECRET from Server:", API_SECRET);
+    console.log("API Gateway from Server:", API_GATEWAY);
   })
   .catch((error) => console.error("Error fetching config:", error));
 
@@ -1008,6 +1011,68 @@ async function PharmacyApproval(value) {
 
 }
 
+
+//check with Machine Learning model
+
+async function submitTransaction(userData) {
+  try {
+      // Send data to ML model API
+      const response = await fetch(ML_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ features: userData }),
+      });
+
+      const result = await response.json();
+      if (!result.approved) {
+          alert("Transaction rejected by ML model.");
+          return true;
+      }
+      else{
+        return false
+      }
+      
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Transaction failed.");
+    }
+}
+
+async function fetchPrescriptionFromIPFS(ipfsHash) {
+  const response = await fetch(`https://${API_GATEWAY}/ipfs/${ipfsHash}`);
+  return response.json(); // Return prescription data
+}
+
+
+
+async function checkML(){
+
+  try{
+    let isfraud=await submitTransaction(patientID);
+    let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash); // Fetch prescription data from IPFS
+
+    if (isfraud){
+      console.log("flagging patient id and prescription id");
+      prescriptionData.PotentialFraud = 1;
+
+      // Re-upload updated prescription JSON to IPFS
+      const newIPFSHash = await uploadToIPFS(prescriptionData);
+      //update contract to  use new ipfs hash
+
+    }
+
+    else {
+      console.log("no flag patient id and prescription id are not fraud");
+    }
+
+  }
+  
+  catch(error){
+    console.error('Error requesting insurance approval:', error);
+    alert("!!Error try again");
+  }
+}
+
 async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
@@ -1140,6 +1205,7 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   }
 
   const jsonData = {
+    PotentialFraud:0,
     patientID: patientid,
     drug1: drug1,
     drug2: drug2,
