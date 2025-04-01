@@ -914,14 +914,20 @@ async function PharmaciesRegistration(value) {
     
     if (!selectedAccount) {
       alert('Please select an account first.');
-      return;
+      return false;
     }
       await RegistrationContract.methods.PharmacyRegistration(value).send({ from: selectedAccount });
       console.log('Pharmacy registration successful.');
       alert('pharmacy registration successful.');
+
+      updatePharmacyDropdown(value); // Update the pharmacy dropdown with the newly registered pharmacy
+
+
+
     }catch(error){
       console.log('Error registering pharmacy:', error);
       alert('!!Error!! Pharmacy registration Unsuccessful.');
+      return false;
     }
     
   }
@@ -1054,14 +1060,16 @@ async function checkML(){
     if (isfraud){
       console.log("flagging patient id and prescription id");
       prescriptionData.PotentialFraud = 1;
-
+      
       // Re-upload updated prescription JSON to IPFS
       const newIPFSHash = await uploadToIPFS(prescriptionData);
       //update contract to  use new ipfs hash
-
+      
+      document.getElementById('AI_info').innerText="Potential Fraud Detected";
     }
 
     else {
+      document.getElementById('AI_info').innerText="Looks safe to proceed";
       console.log("no flag patient id and prescription id are not fraud");
     }
 
@@ -1073,7 +1081,7 @@ async function checkML(){
   }
 }
 
-async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
+async function InsuranceApprovalRequest(prescriptionIPFSHash) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1082,6 +1090,12 @@ async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
       alert('Please select an account first.');
       return;
     }
+    let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash);
+    let patientID=prescriptionData.patientID;
+    let drug1=prescriptionData.drug1;
+    let drug2=prescriptionData.drug2;
+    let drug3=prescriptionData.drug3;
+
   await ApprovalContract.methods.RequestInsuranceApproval(patientID,drug1,drug2,drug3).send({ from: selectedAccount });
   console.log( 'Insurance approval request successful.');
   alert('Insurance approval request successful.');
@@ -1101,7 +1115,17 @@ async function InsuranceApproval(pharmacyid,patientid) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.InsuranceApproval(1,pharmacyid,patientid).send({ from: selectedAccount});
+
+    let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash);
+    let patientID=prescriptionData.patientID;
+    let drug1=prescriptionData.drug1;
+    let drug2=prescriptionData.drug2;
+    let drug3=prescriptionData.drug3;
+
+    let approval=await checkML(patientID,drug1,drug2,drug3); //here i need 13 variables 
+
+
+  await ApprovalContract.methods.InsuranceApproval(approval,pharmacyid,patientid).send({ from: selectedAccount});
   console.log('Insurance approval successful.');
   alert( 'Insurance approval successful.');
 
@@ -1194,6 +1218,7 @@ async function Claimpayment(value) {
 async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   //const API_KEY = process.env.API_KEY;  
   //const API_SECRET = process.env.API_SECRET;
+
   if (!API_KEY || !API_SECRET) {
     console.error("API keys are not loaded yet!");
     return;
@@ -1254,6 +1279,19 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   }
 }
 
+//This is for dynamic update of Phamacy drop down menu
+
+function updatePharmacyDropdown(newAddress) {
+  const pharmacyDropdown = document.getElementById("pharmacyDropdown");
+  //pharmacyDropdown.innerHTML = '<option value="">Select a Pharmacy</option>'; // Reset dropdown
+
+  const option = document.createElement("option");
+    option.value = newAddress;
+    option.textContent = newAddress;
+    pharmacyDropdown.appendChild(option);
+  }
+
+
 //FOR CONTRACT REGISTRATION
 document.getElementById('Physician_Registration').addEventListener('click', () => {
   let Physician=document.getElementById('physician_reg').value
@@ -1266,9 +1304,13 @@ document.getElementById('Patient_Registration').addEventListener('click',() =>{
 document.getElementById('InsuranceCompanyRegistration').addEventListener('click',()=>{
   let  InsuranceCompany=document.getElementById('Company_reg').value
   InsuranceCompaniesRegistration(InsuranceCompany)});
-document.getElementById('Pharmacy_Registration').addEventListener('click',()=> {
+
+document.getElementById('Pharmacy_Registration').addEventListener('click',async ()=> {
   let Pharmacy=document.getElementById('pharmacy_reg').value
-  PharmaciesRegistration(Pharmacy);});
+
+  PharmaciesRegistration(Pharmacy); 
+
+  });
 
 //FOR CONTRACT APPROVAL
 document.getElementById('createpresciption').addEventListener('click', () => {
@@ -1281,23 +1323,31 @@ document.getElementById('createpresciption').addEventListener('click', () => {
   //pharmacy selection********************************
 
   document.getElementById('select-pharmacy').addEventListener('click', () => {
-      let pharma_id=document.getElementById('pharmacy_id').value;
-      PharmacySelection(pharma_id);});
+    let selectedPharmacy = document.getElementById('pharmacyDropdown').value;
+
+    if (!selectedPharmacy) {
+        alert("Please select a pharmacy.");
+        return;
+    }
+
+    PharmacySelection(selectedPharmacy);});
 
   //pharmacy approval
   document.getElementById('approvepharmacy').addEventListener('click', () => {
     let patient_id=document.getElementById('patient_id').value;
     PharmacyApproval(patient_id)});
 
-  //request insurance approval
+  //request insurance approval *******************NEEDS UPDATE********************
   document.getElementById('requestapproval').addEventListener('click', () => {
-    let patientID=document.getElementById('Patient_id_').value;
-    let drug1=document.getElementById('Drug1_').value;
-    let drug2=document.getElementById('Drug2_').value;
-    let drug3=document.getElementById('Drug3_').value;
-    InsuranceApprovalRequest(patientID,drug1,drug2,drug3) });
+    let patientIDIPFS=document.getElementById('Patient_id_IPFS').value; 
+    InsuranceApprovalRequest(patientIDIPFS) });
 
-// insurance approval
+  //for ai button
+  document.getElementById('ML_approval').addEventListener('click', () => {
+    let patientID_IPFS=document.getElementById('patientIDIPFS').value; 
+    InsuranceApproval(patientID_IPFS) });
+
+// insurance approval ************************NEEDS UPDATE *******************************
 document.getElementById('approval').addEventListener('click', () => {
   let pharmacyid=document.getElementById('pharmacy_ID').value;
   let patientID=document.getElementById('patientID').value; 

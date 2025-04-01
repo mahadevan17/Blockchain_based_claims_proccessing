@@ -23,13 +23,13 @@
 
     <div id="registration">
       <h3>ONLY REGULATORY AUTHORITY | Registration</h3>
-        <input id="physician_reg"  type="text" placeholder="Physician Registration">
-        <button id="Physician_Registration">Register Physician</button>
-        <input id="patient_reg"  type="text" placeholder="patient Registration">
-        <button id="Patient_Registration">Register Patient</button>
-        <input id="Company_reg"  type="text" placeholder="Insurance Company Registration">
-        <button id="InsuranceCompanyRegistration">Register Insurance Company</button>
-        <input id="pharmacy_reg"  type="text" placeholder="Pharmacy Registration">
+        Physician Id<input id="physician_reg"  type="text" placeholder="Physician Registration">
+        <button id="Physician_Registration">Register Physician</button><br>
+        Patient Id<input id="patient_reg"  type="text" placeholder="patient Registration">
+        <button id="Patient_Registration">Register Patient</button><br>
+        Insurance Company Id<input id="Company_reg"  type="text" placeholder="Insurance Company Registration">
+        <button id="InsuranceCompanyRegistration">Register Insurance Company</button><br>
+        Pharmacy Id<input id="pharmacy_reg"  type="text" placeholder="Pharmacy Registration">
         <button id="Pharmacy_Registration">Register pharmacy</button>
     </div>
     <hr>
@@ -49,16 +49,18 @@
    <!-- NEEDS WORK-->
    <div id="pharmacyselection">
     <h3>ONLY PATIENT | PHARMACY SELECTION</h3>
-    <input id="pharmacy_id" type="text" placeholder="Pharmacy ID">
+    <p>Please select atleast one pharmacy</p>
     <label>Select Pharmacy:</label>
-    <select id="pharmacyDropdown"></select>
+    <select id="pharmacyDropdown">
+      <option value="--">Select a pharmacy</option>
+    </select>
     <button id="select-pharmacy">Select Pharmacy</button>
 
    </div>
    <hr>
    <div id="pharmacyapproval">
-    <h3>ONLY PHARMACY | PHARMACY APPROVAL</h3>
-    <input type="text" id="patient_id" placeholder="Patient ID">
+    <h3>ONLY PHARMACY | PHARMACY APPROVAL</h3><br>
+    Patient Id<input type="text" id="patient_id" placeholder="Patient ID">
     <button id="approvepharmacy">Approve </button>
    </div>
 
@@ -66,10 +68,7 @@
 
    <div id="requestinsuranceapproval">
     <h3>ONLY PHARMACY | REQUEST INSURANCE APPROVAL</h3>
-    Patient ID&nbsp;<input id="Patient_id_" type="text" placeholder="Patient id"><br>
-    Drug Code 1&nbsp;<input id="Drug1_" type="text" placeholder="Drug Code 1"><br>
-    Drug Code 2&nbsp;<input id="Drug2_" type="text" placeholder="Drug Code 2"><br>
-    Drug Code 3&nbsp;<input id="Drug3_" type="text" placeholder="Drug Code 3"><br>
+    PatientID_IPFS&nbsp;<input id="Patient_id_IPFS" type="text" placeholder="Patient id"><br>
     <button id="requestapproval">Request Approval</button>
    </div>
 
@@ -77,8 +76,11 @@
   
   <div id="insuranceapproval">
     <h3>ONLY INSURANCE COMPANY | INSURANCE APPROVAL</h3>
-    <input type="text" id="pharmacy_ID" placeholder="Pharmacy ID">
-    <input type="text" id="patientID" placeholder="Patient ID">
+    Pharmacy Id<input type="text" id="pharmacy_ID" placeholder="Pharmacy ID">
+    Patient Id<input type="text" id="patientID" placeholder="Patient ID">
+    Prescription Id Ipfs<input type="text" id="patientIDIPFS" placeholder="Patient ID ipfs"><br>
+    <button id="ML_approval">CHECK USING AI</button><br>
+    <p id="AI_info"></p><br>
     <button id="approval">Approve</button>
   </div>
 
@@ -86,13 +88,13 @@
 
   <div id="medicinepreparation">
     <h3>ONLY PHARMACY | MEDICINE PREPARATION</h3>
-    <input type="text" id="patientId" placeholder="Patient ID">
+    Patient Id<input type="text" id="patientId" placeholder="Patient ID">
     <button id="preparemedicine">Update Status</button>
   </div>
 <hr>
   <div id="medicinecollection">
     <h3>ONLY PATIENT | MEDICATION COLLECTION</h3>
-    <input type="text" id="patientId" placeholder="Patient ID">
+    Patient Id<input type="text" id="patientId" placeholder="Patient ID">
     <button id="medicinecollect">Collect Medicines</button>
 
   </div>
@@ -101,8 +103,8 @@
 
   <div id="requestpayment">
     <h3>ONLY PHARMACY | REQUEST PAYMENT</h3>
-    <input type="text" id="medicineinvoiceid" placeholder="Medicine Invoice ID">
-    <input type="text" id="medicinecost" placeholder="Total Medicine Cost">
+    Receipt No<input type="text" id="medicineinvoiceid" placeholder="Medicine Invoice ID">
+    Total bill<input type="text" id="medicinecost" placeholder="Total Medicine Cost">
     <button id="paymentrequest">Request Payment</button>
 
   </div>
@@ -110,11 +112,10 @@
   <hr>
   <div id="claimpayment">
     <h3>ONLY INSURANCE COMPANY | CLAIM PAYMENT</h3>
-    <input type="text" id="medicineinvoice_id" placeholder="Medicine Invoice ID">
+    Receipt No<input type="text" id="medicineinvoice_id" placeholder="Medicine Invoice ID">
     <button id="paymentclaim">Claim Payment</button>
 
-  </div>
-    
+  </div>    
   
   <!-- Scripts -->
   <script src="web3.min.js"></script>
