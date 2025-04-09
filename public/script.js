@@ -1060,10 +1060,11 @@ async function checkML(){
     if (isfraud){
       console.log("flagging patient id and prescription id");
       prescriptionData.PotentialFraud = 1;
+      prescriptionData.prevIpfs=prescriptionIPFSHash; //store the patient id in the prescription data
+
       
       // Re-upload updated prescription JSON to IPFS
-      const newIPFSHash = await uploadToIPFS(prescriptionData);
-      //update contract to  use new ipfs hash
+      const newIPFSHash = await updateFraudStatus(prescriptionIPFSHash,1);
       
       document.getElementById('AI_info').innerText="Potential Fraud Detected";
     }
@@ -1106,7 +1107,7 @@ async function InsuranceApprovalRequest(prescriptionIPFSHash) {
   }
 }
 
-async function InsuranceApproval(pharmacyid,patientid) {
+async function InsuranceApproval(patientID_IPFS,pharmacyid,patientid) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1116,16 +1117,16 @@ async function InsuranceApproval(pharmacyid,patientid) {
       return;
     }
 
-    let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash);
-    let patientID=prescriptionData.patientID;
-    let drug1=prescriptionData.drug1;
-    let drug2=prescriptionData.drug2;
-    let drug3=prescriptionData.drug3;
-
-    let approval=await checkML(patientID,drug1,drug2,drug3); //here i need 13 variables 
+    let prescriptionData = await fetchPrescriptionFromIPFS(patientID_IPFS);
+    if  (prescriptionData.PotentialFraud==1) {
+      alert('Cannot approve prescription due to potential fraud');
+      return;
+    }
 
 
-  await ApprovalContract.methods.InsuranceApproval(approval,pharmacyid,patientid).send({ from: selectedAccount});
+    let _insApproval=document.getElementById("Approve_ins").value;
+    
+  await ApprovalContract.methods.InsuranceApproval(_insApproval,pharmacyid,patientid).send({ from: selectedAccount});
   console.log('Insurance approval successful.');
   alert( 'Insurance approval successful.');
 
@@ -1216,8 +1217,6 @@ async function Claimpayment(value) {
 //for ipfs uploading 
 
 async function uploadToIPFS(patientid, drug1, drug2, drug3) {
-  //const API_KEY = process.env.API_KEY;  
-  //const API_SECRET = process.env.API_SECRET;
 
   if (!API_KEY || !API_SECRET) {
     console.error("API keys are not loaded yet!");
@@ -1235,7 +1234,8 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
     drug1: drug1,
     drug2: drug2,
     drug3: drug3,
-    timestamp: new Date().toISOString() // Adds a timestamp for record keeping
+    timestamp: new Date().toISOString(), // Adds a timestamp for record keeping
+    prevIpfs:0
   };
 
   const metadata = {
@@ -1279,11 +1279,63 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   }
 }
 
+//updating status of potential fraud
+
+async function updateFraudStatus(currentIpfsHash, newFraudValue) {
+  if (!API_KEY || !API_SECRET) {
+    console.error("API keys not loaded!");
+    return;
+  }
+
+  if (!currentIpfsHash) {
+    alert("Please enter the current IPFS hash!");
+    return null;
+  }
+
+  const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${currentIpfsHash}`;
+
+  try {
+    // Fetch existing data
+    const response = await fetch(ipfsUrl);
+    const existingData = await response.json();
+
+    // Modify data
+    const updatedData = {
+      ...existingData,
+      PotentialFraud: newFraudValue,
+      timestamp: new Date().toISOString(),
+      prevIpfs: currentIpfsHash
+    };
+
+    const metadata = {
+      name: `Prescription_${existingData.patientID}_Updated`
+    };
+
+    const pinataBody = {
+      pinataContent: updatedData,
+      pinataMetadata: metadata
+    };
+
+    // Upload to Pinata
+    const uploadResponse = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "pinata_api_key": API_KEY,
+        "pinata_secret_api_key": API_SECRET
+      },
+      body: JSON.stringify(pinataBody)
+    });
+  
+  }catch(error){
+    alert("Update falied try again");
+  }
+}
+
 //This is for dynamic update of Phamacy drop down menu
 
 function updatePharmacyDropdown(newAddress) {
   const pharmacyDropdown = document.getElementById("pharmacyDropdown");
-  //pharmacyDropdown.innerHTML = '<option value="">Select a Pharmacy</option>'; // Reset dropdown
 
   const option = document.createElement("option");
     option.value = newAddress;
@@ -1343,15 +1395,41 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     InsuranceApprovalRequest(patientIDIPFS) });
 
   //for ai button
-  document.getElementById('ML_approval').addEventListener('click', () => {
-    let patientID_IPFS=document.getElementById('patientIDIPFS').value; 
-    InsuranceApproval(patientID_IPFS) });
+  document.getElementById('ML_approval').addEventListener('click', async () => {
+    let patientID_IPFS=document.getElementById('patientIDIPFS').value;
+
+    let prescriptionData = await fetchPrescriptionFromIPFS(patientID_IPFS);
+    let patientID=prescriptionData.patientID;
+    let drug1=prescriptionData.drug1;
+    let drug2=prescriptionData.drug2;
+    let drug3=prescriptionData.drug3;
+    await checkML(patientID,drug1,drug2,drug3); //need 13 variables
+
+     });
+
+  //for ml over ride
+  document.getElementById('button_override').addEventListener('click', async () =>{
+    let patientID_IPFS=document.getElementById('patientIDIPFS').value;
+
+    let prescriptionData = await fetchPrescriptionFromIPFS(patientID_IPFS);
+
+    let override = confirm("Do you want to override the AI's decision?");
+      if (override == true) {
+        await updateFraudStatus(patientID_IPFS,!prescriptionData.PotentialFraud);     
+     }
+      else{
+        alert("Not overRidden");
+      }
+
+    ;});
+
 
 // insurance approval ************************NEEDS UPDATE *******************************
 document.getElementById('approval').addEventListener('click', () => {
   let pharmacyid=document.getElementById('pharmacy_ID').value;
   let patientID=document.getElementById('patientID').value; 
-  InsuranceApproval(pharmacyid,patientID) });
+  let patientIDIPFS=document.getElementById('patientIDIPFS').value;
+  InsuranceApproval(patientIDIPFS,pharmacyid,patientID) });
 
 // medicine preparation
 document.getElementById('preparemedicine').addEventListener('click', () => {
