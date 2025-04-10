@@ -1123,7 +1123,6 @@ async function InsuranceApproval(patientID_IPFS,pharmacyid,patientid) {
       return;
     }
 
-
     let _insApproval=document.getElementById("Approve_ins").value;
     
   await ApprovalContract.methods.InsuranceApproval(_insApproval,pharmacyid,patientid).send({ from: selectedAccount});
@@ -1389,7 +1388,7 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     let patient_id=document.getElementById('patient_id').value;
     PharmacyApproval(patient_id)});
 
-  //request insurance approval *******************NEEDS UPDATE********************
+  //request insurance approval
   document.getElementById('requestapproval').addEventListener('click', () => {
     let patientIDIPFS=document.getElementById('Patient_id_IPFS').value; 
     InsuranceApprovalRequest(patientIDIPFS) });
@@ -1403,6 +1402,7 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     let drug1=prescriptionData.drug1;
     let drug2=prescriptionData.drug2;
     let drug3=prescriptionData.drug3;
+
     await checkML(patientID,drug1,drug2,drug3); //need 13 variables
 
      });
