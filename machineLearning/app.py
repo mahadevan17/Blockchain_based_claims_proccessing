@@ -2,7 +2,11 @@ from flask import Flask, request, jsonify
 import joblib  # for scikit-learn models
 import pandas as pd
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app, origins=['http://localhost:3000'])
+
 
 # Load the model
 model = joblib.load(r'machineLearning\model.pkl') 
