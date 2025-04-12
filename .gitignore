@@ -15,5 +15,5 @@ ignition/deployments
 machineLearning/label_encoders_selected.pkl
 machineLearning/model.pkl
 machineLearning/selected_features.pkl
-machineLearning/StandardScaler_selected.pkl0
+machineLearning/StandardScaler_selected.pkl
 machineLearning/Final_data.csv
