@@ -36,6 +36,7 @@
    <div id="presciptionCreation">
     <h3>ONLY PHYSICIAN | PRESCIPTION CREATION</h3>
     Patient ID&nbsp;<input id="Patient_id" type="text" placeholder="Patient id"><br>
+    Patient address<input type="text" id="pat_address1" placeholder="Patient address"><br>
     Patient Age<input id="age" type="text" placeholder="enter age of patient"><br>
     State<input id="Patient_state" type="text" placeholder="enter State"><br>
     Country<input id="Patient_Country" type="text" placeholder="enter Country"><br>
@@ -73,6 +74,8 @@
 
    <div id="requestinsuranceapproval">
     <h3>ONLY PHARMACY | REQUEST INSURANCE APPROVAL</h3>
+    Patient address<input type="text" id="pat_address2" placeholder="Patient address"><br>
+
     PatientID_IPFS&nbsp;<input id="Patient_id_IPFS" type="text" placeholder="Patient id"><br>
     <button id="requestapproval">Request Approval</button>
    </div>
@@ -82,7 +85,9 @@
   <div id="insuranceapproval">
     <h3>ONLY INSURANCE COMPANY | INSURANCE APPROVAL</h3>
     Pharmacy Id<input type="text" id="pharmacy_ID" placeholder="Pharmacy ID"><br>
+    pharmacy address<input  type="text" id="pharmacy_address" placeholder="Pharmacy address"><br>
     Patient Id<input type="text" id="patientID" placeholder="Patient ID"><br>
+    Patient address<input  type="text" id="patient_address" placeholder="Patient address"><br>
     Prescription IdIpfs<input type="text" id="patientIDIPFS" placeholder="Patient ID ipfs"><br>
     Claim ID<input type="text" id="claimid" placeholder="Claim ID"><br>
     InscClaimAmtReimbursed<input type="number"  id="InscClaimAmtReimbursed" placeholder="Insurance Claim Amt Reimbursed" placeholder="enter if any"><br>
@@ -91,11 +96,13 @@
     
     <button id="ML_approval">CHECK USING AI</button><br>
     <p id="AI_info"></p><br>
+    <!--New ipfs hash(to over Ride)<input type="text" id="patient_newIPFS" placeholder="Patient new ipfs"><br>-->
     <button id="button_override">Override ?</button><br>
+    <p id="overide_info"></p>
     <select id="Approve_ins">
       <option value="--">Select</option>
       <option value=1>Approve</option>
-      <option value="0">Reject</option>
+      <option value=0>Reject</option>
     </select>
     <button id="approval">Approve</button>
   </div>

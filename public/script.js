@@ -954,7 +954,7 @@ async function PatientsRegistration(value) {
 
 
 //APPROVAL************************************************
-async function PresciptionCreation(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
+async function PresciptionCreation(patient_address,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -970,7 +970,7 @@ async function PresciptionCreation(patientID,pat_age,State_patient,Country,doc1,
       return;
     }
 
-  await ApprovalContract.methods.PrescriptionCreation(patientID,drug1,drug2,drug3,hash).send({ from: selectedAccount });
+  await ApprovalContract.methods.PrescriptionCreation(patient_address,drug1,drug2,drug3,hash).send({ from: selectedAccount });
   console.log('Prescription creation successful.');
   alert('Prescription creation successful.');
   } catch (error) {
@@ -1032,7 +1032,7 @@ async function submitTransaction(userData) {
       });
 
       const result = await response.json();
-      if (!result.approved) {
+      if (result.approved) {
           alert("Transaction rejected by ML model.");
           return true;
       }
@@ -1062,20 +1062,25 @@ async function checkML(hash,features){
     if (isfraud){
       console.log("flagging patient id and prescription id");
       prescriptionData.PotentialFraud = 1;
-      prescriptionData.prevIpfs=prescriptionIPFSHash; //store the patient id in the prescription data
+      prescriptionData.prevIpfs=hash; //store the patient id in the prescription data
 
       
       // Re-upload updated prescription JSON to IPFS
       const newIPFSHash = await updateFraudStatus(hash,1);
       
       document.getElementById('AI_info').innerText="Potential Fraud Detected\nNew hash: "+newIPFSHash; // Update UI with new hash
+      alert("Potential Fraud Detected , please investigate!");
+
+
+      document.getElementById('patientIDIPFS').value=newIPFSHash;
       console.log("fraud flag raised");
 
 
     }
 
     else {
-      document.getElementById('AI_info').innerText="Looks safe to proceed";
+      document.getElementById('AI_info').innerText="prescription "+Hash+" Looks safe to proceed: ";
+      alert("No flags detected may proceed");
       console.log("no flag patient id and prescription id are not fraud");
     }
 
@@ -1087,7 +1092,7 @@ async function checkML(hash,features){
   }
 }
 
-async function InsuranceApprovalRequest(prescriptionIPFSHash) {
+async function InsuranceApprovalRequest(prescriptionIPFSHash,patAdd) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1097,7 +1102,7 @@ async function InsuranceApprovalRequest(prescriptionIPFSHash) {
       return;
     }
     let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash);
-    let patientID=prescriptionData.patientID;
+    let patientID=patAdd
     let drug1=prescriptionData.drug1;
     let drug2=prescriptionData.drug2;
     let drug3=prescriptionData.drug3;
@@ -1112,7 +1117,7 @@ async function InsuranceApprovalRequest(prescriptionIPFSHash) {
   }
 }
 
-async function InsuranceApproval(patientID_IPFS,pharmacyid,patientid) {
+async function InsuranceApproval(patientID_IPFS,pharmacyAdd,patientid) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1130,7 +1135,7 @@ async function InsuranceApproval(patientID_IPFS,pharmacyid,patientid) {
 
     let _insApproval=document.getElementById("Approve_ins").value;
     
-  await ApprovalContract.methods.InsuranceApproval(_insApproval,pharmacyid,patientid).send({ from: selectedAccount});
+  await ApprovalContract.methods.InsuranceApproval(_insApproval,pharmacyAdd,patientid).send({ from: selectedAccount});
   console.log('Insurance approval successful.');
   alert( 'Insurance approval successful.');
 
@@ -1301,7 +1306,7 @@ async function updateFraudStatus(currentIpfsHash, newFraudValue) {
     return null;
   }
 
-  const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${currentIpfsHash}`;
+  const ipfsUrl = `https://${API_GATEWAY}/ipfs/${currentIpfsHash}`;
 
   try {
     // Fetch existing data
@@ -1335,11 +1340,13 @@ async function updateFraudStatus(currentIpfsHash, newFraudValue) {
       },
       body: JSON.stringify(pinataBody)
     });
-    let res=uploadResponse.json()
-    document.getElementById("AI_info").innerText="new ipfs hash is : "+res.IpfsHash;
+    let res=await uploadResponse.json()
+    document.getElementById('patientIDIPFS').value=res.IpfsHash;
+    return res.IpfsHash;
   
   }catch(error){
     alert("Update falied try again");
+    return null;
   }
 }
 
@@ -1378,6 +1385,7 @@ document.getElementById('Pharmacy_Registration').addEventListener('click',async 
 //FOR CONTRACT APPROVAL
 document.getElementById('createpresciption').addEventListener('click', () => {
   let patientID=document.getElementById('Patient_id').value;
+  let patAddress=document.getElementById("pat_address1").value; 
   let pat_age=document.getElementById("age").value;
   let State_patient=document.getElementById("Patient_state").value;
   let Country=document.getElementById("Patient_Country").value;
@@ -1386,7 +1394,7 @@ document.getElementById('createpresciption').addEventListener('click', () => {
   let drug1=document.getElementById('Drug1').value;
   let drug2=document.getElementById('Drug2').value;
   let drug3=document.getElementById('Drug3').value;
-  PresciptionCreation(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) });
+  PresciptionCreation(patAddress,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) });
 
   //pharmacy selection********************************
 
@@ -1407,8 +1415,9 @@ document.getElementById('createpresciption').addEventListener('click', () => {
 
   //request insurance approval
   document.getElementById('requestapproval').addEventListener('click', () => {
-    let patientIDIPFS=document.getElementById('Patient_id_IPFS').value; 
-    InsuranceApprovalRequest(patientIDIPFS) });
+    let patientIDIPFS=document.getElementById('Patient_id_IPFS').value;
+    let patAddress=document.getElementById("pat_address2").value; 
+    InsuranceApprovalRequest(patientIDIPFS,patAddress) });
 
   //for ai button
   document.getElementById('ML_approval').addEventListener('click', async () => {
@@ -1439,14 +1448,33 @@ document.getElementById('createpresciption').addEventListener('click', () => {
 
   //for ml over ride
   document.getElementById('button_override').addEventListener('click', async () =>{
+    //let patientID_IPFS=document.getElementById('patient_newIPFS').value;
     let patientID_IPFS=document.getElementById('patientIDIPFS').value;
-
+    
     let prescriptionData = await fetchPrescriptionFromIPFS(patientID_IPFS);
 
     let override = confirm("Do you want to override the AI's decision?");
       if (override == true) {
-        await updateFraudStatus(patientID_IPFS,!prescriptionData.PotentialFraud);     
-     }
+        let status;
+        if (prescriptionData.PotentialFraud==1){
+          status=await updateFraudStatus(patientID_IPFS,0); 
+          alert("Fraud status updated to 0 (not Fraud)");
+          
+          document.getElementById("overide_info").innerText="updated \nNew hash"+status;
+
+          console("Fraud status updated to 0 (not Fraud)");
+
+
+        }
+        else if (prescriptionData.PotentialFraud==0){
+          status=await updateFraudStatus(patientID_IPFS,1);
+          alert("Fraud status updated to 1 (Fraud)");
+          document.getElementById("overide_info").innerText="updated \nNew hash"+status;
+          console.log("Fraud status updated to 1 (Fraud)")
+        }
+        document.getElementById('patientIDIPFS').value=status;
+
+    }
       else{
         alert("Not overRidden");
       }
@@ -1454,12 +1482,12 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     ;});
 
 
-// insurance approval ************************NEEDS UPDATE *******************************
+// insurance approval 
 document.getElementById('approval').addEventListener('click', () => {
-  let pharmacyid=document.getElementById('pharmacy_ID').value;
-  let patientID=document.getElementById('patientID').value; 
+  let pharmacyAdd=document.getElementById('pharmacy_address').value;
+  let patientID=document.getElementById('patient_address').value; 
   let patientIDIPFS=document.getElementById('patientIDIPFS').value;
-  InsuranceApproval(patientIDIPFS,pharmacyid,patientID) });
+  InsuranceApproval(patientIDIPFS,pharmacyAdd,patientID) });
 
 // medicine preparation
 document.getElementById('preparemedicine').addEventListener('click', () => {
