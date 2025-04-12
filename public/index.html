@@ -36,9 +36,14 @@
    <div id="presciptionCreation">
     <h3>ONLY PHYSICIAN | PRESCIPTION CREATION</h3>
     Patient ID&nbsp;<input id="Patient_id" type="text" placeholder="Patient id"><br>
+    Patient Age<input id="age" type="text" placeholder="enter age of patient"><br>
+    State<input id="Patient_state" type="text" placeholder="enter State"><br>
+    Country<input id="Patient_Country" type="text" placeholder="enter Country"><br>
     Drug Code 1&nbsp;<input id="Drug1" type="text" placeholder="Drug Code 1"><br>
     Drug Code 2&nbsp;<input id="Drug2" type="text" placeholder="Drug Code 2"><br>
     Drug Code 3&nbsp;<input id="Drug3" type="text" placeholder="Drug Code 3"><br>
+    Attending Physician<input id="Attending_doc" type="text" placeholder="enter Doctor id"><br>
+    Other Physician<input id="other_doc" type="text" placeholder="enter Doctor id"><br>
     <button id="createpresciption">Create Presciption</button>
     <p id="ipfs-status"></p>
     <p><strong>IPFS CID:</strong> <span id="ipfsHash"></span></p>
@@ -79,6 +84,11 @@
     Pharmacy Id<input type="text" id="pharmacy_ID" placeholder="Pharmacy ID"><br>
     Patient Id<input type="text" id="patientID" placeholder="Patient ID"><br>
     Prescription IdIpfs<input type="text" id="patientIDIPFS" placeholder="Patient ID ipfs"><br>
+    Claim ID<input type="text" id="claimid" placeholder="Claim ID"><br>
+    InscClaimAmtReimbursed<input type="number"  id="InscClaimAmtReimbursed" placeholder="Insurance Claim Amt Reimbursed" placeholder="enter if any"><br>
+    Annual Reimbursement<input type="number"  id="annualreimbursement" placeholder="Annual Reimbursement" placeholder="enter if any"><br>
+    Annual DeductibleAmt<input type="number"  id="annualdeductible" placeholder="Annual DeductibleAmt" placeholder="enter if any"><br>
+    
     <button id="ML_approval">CHECK USING AI</button><br>
     <p id="AI_info"></p><br>
     <button id="button_override">Override ?</button><br>
