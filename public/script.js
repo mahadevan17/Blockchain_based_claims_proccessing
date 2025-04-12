@@ -1079,7 +1079,7 @@ async function checkML(hash,features){
     }
 
     else {
-      document.getElementById('AI_info').innerText="prescription "+Hash+" Looks safe to proceed: ";
+      document.getElementById('AI_info').innerText="prescription "+hash+" Looks safe to proceed: ";
       alert("No flags detected may proceed");
       console.log("no flag patient id and prescription id are not fraud");
     }
@@ -1306,12 +1306,12 @@ async function updateFraudStatus(currentIpfsHash, newFraudValue) {
     return null;
   }
 
-  const ipfsUrl = `https://${API_GATEWAY}/ipfs/${currentIpfsHash}`;
+  //const ipfsUrl = `https://${API_GATEWAY}/ipfs/${currentIpfsHash}`;
 
   try {
     // Fetch existing data
-    const response = await fetch(ipfsUrl);
-    const existingData = await response.json();
+    
+    const existingData = await fetchPrescriptionFromIPFS(currentIpfsHash);
 
     // Modify data
     const updatedData = {
@@ -1360,6 +1360,54 @@ function updatePharmacyDropdown(newAddress) {
     option.textContent = newAddress;
     pharmacyDropdown.appendChild(option);
   }
+
+  //This is for viewing patient history of prescriptions
+
+  async function viewPatientHistory(patientipfs_hash) {
+    const historyContainer = document.getElementById('patient-history');
+    historyContainer.innerHTML = ""; // Clear old content if any
+  
+    let currentHash = patientipfs_hash;
+    let counter = 1;
+  
+    while (currentHash !== 0) {
+      try {
+        const data = await fetchPrescriptionFromIPFS(currentHash);
+  
+        // Create a div or section for this prescription
+        const entry = document.createElement("div");
+        entry.innerHTML = `
+        <h3>Prescription ${counter}</h3>
+        <p><strong>Date and Time:</strong> ${data.timestamp}</p>
+          <p><strong>PotentialFraud:</strong> ${data.PotentialFraud}</p>
+          <p><strong>Patient ID:</strong> ${data.patientID}</p>
+          <p><strong>AGE:</strong> ${data.Age}</p>
+          <p><strong>Country:</strong> ${data.Country}</p>
+          <p><strong>Attending Physician:</strong> ${data.AttendingPhysician}</p>
+          <p><strong>Other Physician:</strong> ${data.OtherPhysician}</p>
+          <p><b>Drugs prescribed Previously</b></p>
+            <p><strong>Drug1:</strong> ${data.drug1}</p>
+            <p><strong>Drug2:</strong> ${data.drug2}</p>
+            <p><strong>Drug3:</strong> ${data.drug3}</p>
+          <hr/>
+        `;
+        historyContainer.appendChild(entry);
+  
+        // Move to previous hash
+        currentHash = data.prevIpfs;
+        counter++;
+      } catch (error) {
+        console.error("Error fetching data from IPFS:", error);
+        break;
+      }
+    }
+  
+    if (counter === 1) {
+      historyContainer.innerText = "No history found.";
+    }
+
+  }
+
 
 
 //FOR CONTRACT REGISTRATION
@@ -1462,7 +1510,7 @@ document.getElementById('createpresciption').addEventListener('click', () => {
           
           document.getElementById("overide_info").innerText="updated \nNew hash"+status;
 
-          console("Fraud status updated to 0 (not Fraud)");
+          console.log("Fraud status updated to 0 (not Fraud)");
 
 
         }
@@ -1511,3 +1559,9 @@ document.getElementById('paymentrequest').addEventListener('click',()=>{
 document.getElementById('paymentclaim').addEventListener('click',()=>{
   let  invoiceid=document.getElementById('medicineinvoice_id').value;
   Claimpayment(invoiceid)});
+
+//Patient History check
+document.getElementById('Patient_Prescription').addEventListener('click', () => {
+  let curr_ipfs = document.getElementById('currentipfsid').value;
+  viewPatientHistory(curr_ipfs);
+});
