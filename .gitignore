@@ -12,3 +12,8 @@ artifacts
 cache
 ignition/deployments
 .env
+machineLearning/label_encoders_selected.pkl
+machineLearning/model.pkl
+machineLearning/selected_features.pkl
+machineLearning/StandardScaler_selected.pkl0
+machineLearning/Final_data.csv
