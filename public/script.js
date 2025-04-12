@@ -3,6 +3,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 let API_KEY;
 let API_SECRET;
 let API_GATEWAY;
+let ML_API_URL;
 
 fetch("/config")
   .then((response) => response.json())
@@ -11,6 +12,7 @@ fetch("/config")
     API_KEY = config.API_KEY; 
     API_SECRET = config.API_SECRET;
     API_GATEWAY = config.API_GATEWAY;
+    ML_API_URL = config.ML_API_URL;
     
     console.log("API Key from Server:", API_KEY);
     console.log("API SECRET from Server:", API_SECRET);
@@ -952,7 +954,7 @@ async function PatientsRegistration(value) {
 
 
 //APPROVAL************************************************
-async function PresciptionCreation(patientid,drug1,drug2,drug3) {
+async function PresciptionCreation(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -962,13 +964,13 @@ async function PresciptionCreation(patientid,drug1,drug2,drug3) {
       return;
     }
 
-    let hash=await uploadToIPFS(patientid,drug1,drug2,drug3); // Upload the prescription to IPFS
+    let hash=await uploadToIPFS(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3); // Upload the prescription to IPFS
     if (!hash) {
       alert('Failed to upload to IPFS. Try again.');
       return;
     }
 
-  await ApprovalContract.methods.PrescriptionCreation(patientid,drug1,drug2,drug3,hash).send({ from: selectedAccount });
+  await ApprovalContract.methods.PrescriptionCreation(patientID,drug1,drug2,drug3,hash).send({ from: selectedAccount });
   console.log('Prescription creation successful.');
   alert('Prescription creation successful.');
   } catch (error) {
@@ -1051,11 +1053,11 @@ async function fetchPrescriptionFromIPFS(ipfsHash) {
 
 
 
-async function checkML(){
+async function checkML(hash,features){
 
   try{
-    let isfraud=await submitTransaction(patientID);
-    let prescriptionData = await fetchPrescriptionFromIPFS(prescriptionIPFSHash); // Fetch prescription data from IPFS
+    let isfraud=await submitTransaction(features);
+    let prescriptionData = await fetchPrescriptionFromIPFS(hash); // Fetch prescription data from IPFS
 
     if (isfraud){
       console.log("flagging patient id and prescription id");
@@ -1064,9 +1066,12 @@ async function checkML(){
 
       
       // Re-upload updated prescription JSON to IPFS
-      const newIPFSHash = await updateFraudStatus(prescriptionIPFSHash,1);
+      const newIPFSHash = await updateFraudStatus(hash,1);
       
-      document.getElementById('AI_info').innerText="Potential Fraud Detected";
+      document.getElementById('AI_info').innerText="Potential Fraud Detected\nNew hash: "+newIPFSHash; // Update UI with new hash
+      console.log("fraud flag raised");
+
+
     }
 
     else {
@@ -1215,21 +1220,26 @@ async function Claimpayment(value) {
 
 //for ipfs uploading 
 
-async function uploadToIPFS(patientid, drug1, drug2, drug3) {
+async function uploadToIPFS(patientiD,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
 
   if (!API_KEY || !API_SECRET) {
     console.error("API keys are not loaded yet!");
     return;
   }
 
-  if (!patientid || !drug1 || !drug2 || !drug3) {
+  if (!patientiD || !drug1 || !drug2 || !drug3) {
     alert("Please fill in all fields!");
     return null;
   }
 
   const jsonData = {
     PotentialFraud:0,
-    patientID: patientid,
+    patientID: patientiD,
+    Age:pat_age,
+    State:State_patient,
+    Country:Country,
+    AttendingPhysician:doc1,
+    OtherPhysician:doc2,
     drug1: drug1,
     drug2: drug2,
     drug3: drug3,
@@ -1238,7 +1248,7 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   };
 
   const metadata = {
-    name: `Prescription_${patientid}`, 
+    name: `Prescription_${patientiD}`, 
   };
 
   const pinataBody = {
@@ -1325,6 +1335,8 @@ async function updateFraudStatus(currentIpfsHash, newFraudValue) {
       },
       body: JSON.stringify(pinataBody)
     });
+    let res=uploadResponse.json()
+    document.getElementById("AI_info").innerText="new ipfs hash is : "+res.IpfsHash;
   
   }catch(error){
     alert("Update falied try again");
@@ -1366,10 +1378,15 @@ document.getElementById('Pharmacy_Registration').addEventListener('click',async 
 //FOR CONTRACT APPROVAL
 document.getElementById('createpresciption').addEventListener('click', () => {
   let patientID=document.getElementById('Patient_id').value;
+  let pat_age=document.getElementById("age").value;
+  let State_patient=document.getElementById("Patient_state").value;
+  let Country=document.getElementById("Patient_Country").value;
+  let doc1= document.getElementById("Attending_doc").value;
+  let doc2=document.getElementById("other_doc").value;
   let drug1=document.getElementById('Drug1').value;
   let drug2=document.getElementById('Drug2').value;
   let drug3=document.getElementById('Drug3').value;
-  PresciptionCreation(patientID,drug1,drug2,drug3) });
+  PresciptionCreation(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) });
 
   //pharmacy selection********************************
 
@@ -1398,12 +1415,25 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     let patientID_IPFS=document.getElementById('patientIDIPFS').value;
 
     let prescriptionData = await fetchPrescriptionFromIPFS(patientID_IPFS);
-    let patientID=prescriptionData.patientID;
-    let drug1=prescriptionData.drug1;
-    let drug2=prescriptionData.drug2;
-    let drug3=prescriptionData.drug3;
+    
+    let patientID=prescriptionData.patientID;//1 beneid
+    let claimid=document.getElementById("claimid").value; //2 claimid
+    let provider=document.getElementById("pharmacy_ID").value // 3 provider
+    let InscClaimAmtReimbursed=document.getElementById("InscClaimAmtReimbursed").value; // 4 InscClaimAmtReimbursed 
+    let attending_doc=prescriptionData.doc1; //5 attendingphysician
+    let other_doc=prescriptionData.doc2;   //6 otherphysician
+    let drug1=prescriptionData.drug1; //7 claimdignoticscode1
+    let drug2=prescriptionData.drug2; //8 claimdignoticscode2
+    let state=prescriptionData.State; //9 state
+    let country=prescriptionData.Country; // 10 country
+    let annReimbursed=document.getElementById("annualreimbursement"); //11 annualreimbursement
+    let annDeductible=document.getElementById("annualdeductible").value; //12  annualdeductible
+    let age=prescriptionData.pat_age; //13 age
 
-    await checkML(patientID,drug1,drug2,drug3); //need 13 variables
+    let inpFeatures=[patientID,claimid,provider,InscClaimAmtReimbursed,attending_doc,other_doc,drug1,drug2,
+      state,country,annReimbursed,annDeductible,age]; //input features for model
+
+    await checkML(patientID_IPFS,inpFeatures);
 
      });
 
