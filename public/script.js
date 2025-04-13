@@ -14,9 +14,9 @@ fetch("/config")
     API_GATEWAY = config.API_GATEWAY;
     ML_API_URL = config.ML_API_URL;
     
-    console.log("API Key from Server:", API_KEY);
-    console.log("API SECRET from Server:", API_SECRET);
-    console.log("API Gateway from Server:", API_GATEWAY);
+    //console.log("API Key from Server:", API_KEY);
+    //console.log("API SECRET from Server:", API_SECRET);
+    //console.log("API Gateway from Server:", API_GATEWAY);
   })
   .catch((error) => console.error("Error fetching config:", error));
 
@@ -954,7 +954,7 @@ async function PatientsRegistration(value) {
 
 
 //APPROVAL************************************************
-async function PresciptionCreation(patient_address,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
+async function PresciptionCreation(patient_address,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3,prevhash) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -964,7 +964,7 @@ async function PresciptionCreation(patient_address,patientID,pat_age,State_patie
       return;
     }
 
-    let hash=await uploadToIPFS(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3); // Upload the prescription to IPFS
+    let hash=await uploadToIPFS(patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3,prevhash); // Upload the prescription to IPFS
     if (!hash) {
       alert('Failed to upload to IPFS. Try again.');
       return;
@@ -1022,27 +1022,27 @@ async function PharmacyApproval(value) {
 
 //check with Machine Learning model
 
-async function submitTransaction(userData) {
+async function submitTransaction(Data) {
   try {
       // Send data to ML model API
       const response = await fetch(ML_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ features: userData }),
+          body: JSON.stringify({ features: Data }),
       });
 
       const result = await response.json();
-      if (result.approved) {
-          alert("Transaction rejected by ML model.");
+      if (result.fraud) {
+          alert("Prescription rejected by ML model.");
           return true;
       }
       else{
-        return false
+        return false;
       }
       
     } catch (error) {
         console.error("Error:", error);
-        alert("Transaction failed.");
+        alert("Precription check failed.");
     }
 }
 
@@ -1225,7 +1225,7 @@ async function Claimpayment(value) {
 
 //for ipfs uploading 
 
-async function uploadToIPFS(patientiD,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) {
+async function uploadToIPFS(patientiD,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3,previoushash) {
 
   if (!API_KEY || !API_SECRET) {
     console.error("API keys are not loaded yet!");
@@ -1249,7 +1249,7 @@ async function uploadToIPFS(patientiD,pat_age,State_patient,Country,doc1,doc2,dr
     drug2: drug2,
     drug3: drug3,
     timestamp: new Date().toISOString(), // Adds a timestamp for record keeping
-    prevIpfs:0
+    prevIpfs:previoushash
   };
 
   const metadata = {
@@ -1382,6 +1382,7 @@ function updatePharmacyDropdown(newAddress) {
           <p><strong>PotentialFraud:</strong> ${data.PotentialFraud}</p>
           <p><strong>Patient ID:</strong> ${data.patientID}</p>
           <p><strong>AGE:</strong> ${data.Age}</p>
+          <p><strong>State:</strong> ${data.State}</p>
           <p><strong>Country:</strong> ${data.Country}</p>
           <p><strong>Attending Physician:</strong> ${data.AttendingPhysician}</p>
           <p><strong>Other Physician:</strong> ${data.OtherPhysician}</p>
@@ -1442,7 +1443,12 @@ document.getElementById('createpresciption').addEventListener('click', () => {
   let drug1=document.getElementById('Drug1').value;
   let drug2=document.getElementById('Drug2').value;
   let drug3=document.getElementById('Drug3').value;
-  PresciptionCreation(patAddress,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3) });
+  let prevPrescription=document.getElementById("currentipfsid").value;
+  if  (prevPrescription === "") {
+    prevPrescription=0;
+  }
+
+  PresciptionCreation(patAddress,patientID,pat_age,State_patient,Country,doc1,doc2,drug1,drug2,drug3,prevPrescription) });
 
   //pharmacy selection********************************
 
