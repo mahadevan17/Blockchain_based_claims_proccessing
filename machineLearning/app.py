@@ -9,10 +9,13 @@ CORS(app, origins=['http://localhost:3000'])
 
 
 # Load the model
-model = joblib.load(r'machineLearning\model.pkl') 
+model1 = joblib.load(r'machineLearning\model.pkl')
+#model2 = joblib.load(r'machineLearning\rmodel.pkl')
 encoders = joblib.load(r'machineLearning\label_encoders_selected.pkl')
 scaler = joblib.load(r'machineLearning\StandardScaler_selected.pkl')
-selected_features = joblib.load(r'machineLearning\selected_features.pkl')
+
+
+
 
 @app.route('/')
 def home():
@@ -20,6 +23,7 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    
 
     if not request.is_json:
        return jsonify({"error": "Request must be JSON"}), 400
@@ -31,27 +35,44 @@ def predict():
         return jsonify({"error": "No features provided"}), 400
 
     try:
-        print(features)
-        # Step 1: Create DataFrame from input
-        input_df = pd.DataFrame([features], columns=selected_features)
-
-        # Step 2: Apply Label Encoding on selected categorical columns
-        for col, le in encoders.items():
-            if col in input_df.columns:
-                input_df[col] = input_df[col].apply(lambda x: x if x in le.classes_ else 'unknown')
-                input_df[col] = le.transform(input_df[col])
         
-        # Step 3: Ensure correct feature order and select only used columns
-        input_df = input_df.reindex(columns=selected_features)
-        print("reindexing")
-        print(input_df)
-        # Step 4: Scale the inputs
-        input_scaled = scaler.transform(input_df)
-        print(input_scaled)
-        # Step 5: Predict
-        prediction = model.predict(input_scaled)
+        features[5]=int(features[5])
+        features[6]=int(features[6])
+        features[7]=int(features[7])
+        features[8]=int(features[8])
+        features[9]=int(features[9])
+        features[10]=int(features[10])
+        features[11]=int(features[11])
+        features[12]=int(features[12])
+
+        print(features)
+        cols=["BeneID","ClaimID","Provider","AttendingPhysician","OtherPhysician","ClmDiagnosisCode_1","ClmDiagnosisCode_2","State","County","InscClaimAmtReimbursed","OPAnnualReimbursementAmt","OPAnnualDeductibleAmt","Age"]
+        # Step 1: Create DataFrame from input
+        input_df = pd.DataFrame([features], columns=cols)
+        
+        num_cols=["InscClaimAmtReimbursed","OPAnnualReimbursementAmt","OPAnnualDeductibleAmt","Age"]
+        
+        catogorical_cols=["BeneID","ClaimID","Provider","AttendingPhysician","OtherPhysician","ClmDiagnosisCode_1","ClmDiagnosisCode_2"]
+        
+        # Step 2: Apply Label Encoding on selected categorical columns
+        for col in catogorical_cols:
+            le = encoders[col]
+            input_df[col] = input_df[col].apply(lambda x: x if x in le.classes_ else 'unknown')
+            input_df[col] = le.transform(input_df[col])
+        
+        # Step 3: Scale the inputs
+        input_df[num_cols] = scaler.transform(input_df[num_cols])
+
+
+        input_df = input_df[cols]
+        print("This is input df")
+        print(input_df)     
+
+        # Step 4: Predict
+        prediction = model1.predict(input_df)
+        #print(prediction)
         is_fraud = bool(prediction[0])  # Example: 1 = Fraud, 0 = No Fraud
-        print(is_fraud)
+        #print(is_fraud)
         return jsonify({'fraud': is_fraud})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
