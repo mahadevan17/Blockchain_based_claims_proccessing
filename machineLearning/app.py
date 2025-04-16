@@ -31,25 +31,27 @@ def predict():
         return jsonify({"error": "No features provided"}), 400
 
     try:
+        print(features)
         # Step 1: Create DataFrame from input
-        input_df = pd.DataFrame([features])
+        input_df = pd.DataFrame([features], columns=selected_features)
 
         # Step 2: Apply Label Encoding on selected categorical columns
         for col, le in encoders.items():
             if col in input_df.columns:
                 input_df[col] = input_df[col].apply(lambda x: x if x in le.classes_ else 'unknown')
                 input_df[col] = le.transform(input_df[col])
-
+        
         # Step 3: Ensure correct feature order and select only used columns
         input_df = input_df.reindex(columns=selected_features)
-
+        print("reindexing")
+        print(input_df)
         # Step 4: Scale the inputs
         input_scaled = scaler.transform(input_df)
-
+        print(input_scaled)
         # Step 5: Predict
         prediction = model.predict(input_scaled)
         is_fraud = bool(prediction[0])  # Example: 1 = Fraud, 0 = No Fraud
-
+        print(is_fraud)
         return jsonify({'fraud': is_fraud})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
