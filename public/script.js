@@ -1483,15 +1483,15 @@ document.getElementById('createpresciption').addEventListener('click', () => {
     let claimid=document.getElementById("claimid").value; //2 claimid
     let provider=document.getElementById("pharmacy_ID").value // 3 provider
     let InscClaimAmtReimbursed=document.getElementById("InscClaimAmtReimbursed").value; // 4 InscClaimAmtReimbursed 
-    let attending_doc=prescriptionData.doc1; //5 attendingphysician
-    let other_doc=prescriptionData.doc2;   //6 otherphysician
+    let attending_doc=prescriptionData.AttendingPhysician; //5 attendingphysician
+    let other_doc=prescriptionData.OtherPhysician;   //6 otherphysician
     let drug1=prescriptionData.drug1; //7 claimdignoticscode1
     let drug2=prescriptionData.drug2; //8 claimdignoticscode2
     let state=prescriptionData.State; //9 state
     let country=prescriptionData.Country; // 10 country
-    let annReimbursed=document.getElementById("annualreimbursement"); //11 annualreimbursement
+    let annReimbursed=document.getElementById("annualreimbursement").value; //11 annualreimbursement
     let annDeductible=document.getElementById("annualdeductible").value; //12  annualdeductible
-    let age=prescriptionData.pat_age; //13 age
+    let age=prescriptionData.Age; //13 age
 
     let inpFeatures=[patientID,claimid,provider,InscClaimAmtReimbursed,attending_doc,other_doc,drug1,drug2,
       state,country,annReimbursed,annDeductible,age]; //input features for model
