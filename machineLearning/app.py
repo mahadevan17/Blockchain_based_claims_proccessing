@@ -35,32 +35,25 @@ def predict():
         return jsonify({"error": "No features provided"}), 400
 
     try:
-        
-        features[5]=int(features[5])
-        features[6]=int(features[6])
-        features[7]=int(features[7])
-        features[8]=int(features[8])
-        features[9]=int(features[9])
-        features[10]=int(features[10])
-        features[11]=int(features[11])
-        features[12]=int(features[12])
+        for i in range(5,13):
+            features[i] = int(features[i])
 
         print(features)
         cols=["BeneID","ClaimID","Provider","AttendingPhysician","OtherPhysician","ClmDiagnosisCode_1","ClmDiagnosisCode_2","State","County","InscClaimAmtReimbursed","OPAnnualReimbursementAmt","OPAnnualDeductibleAmt","Age"]
-        # Step 1: Create DataFrame from input
+        # Create DataFrame from input
         input_df = pd.DataFrame([features], columns=cols)
         
         num_cols=["InscClaimAmtReimbursed","OPAnnualReimbursementAmt","OPAnnualDeductibleAmt","Age"]
         
         catogorical_cols=["BeneID","ClaimID","Provider","AttendingPhysician","OtherPhysician","ClmDiagnosisCode_1","ClmDiagnosisCode_2"]
         
-        # Step 2: Apply Label Encoding on selected categorical columns
+        #Apply Label Encoding on selected categorical columns
         for col in catogorical_cols:
             le = encoders[col]
             input_df[col] = input_df[col].apply(lambda x: x if x in le.classes_ else 'unknown')
             input_df[col] = le.transform(input_df[col])
         
-        # Step 3: Scale the inputs
+        #Scale the inputs
         input_df[num_cols] = scaler.transform(input_df[num_cols])
 
 
@@ -68,7 +61,7 @@ def predict():
         print("This is input df")
         print(input_df)     
 
-        # Step 4: Predict
+        # Predict
         prediction = model1.predict(input_df)
         #print(prediction)
         is_fraud = bool(prediction[0])  # Example: 1 = Fraud, 0 = No Fraud
