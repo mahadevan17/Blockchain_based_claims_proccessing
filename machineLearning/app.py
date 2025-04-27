@@ -7,23 +7,18 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])
 
-
 # Load the model
 model1 = joblib.load(r'machineLearning\model.pkl')
 #model2 = joblib.load(r'machineLearning\rmodel.pkl')
 encoders = joblib.load(r'machineLearning\label_encoders_selected.pkl')
 scaler = joblib.load(r'machineLearning\StandardScaler_selected.pkl')
 
-
-
-
 @app.route('/')
 def home():
     return jsonify({"message": "Flask API is running!"})
 
 @app.route('/predict', methods=['POST'])
-def predict():
-    
+def predict():   
 
     if not request.is_json:
        return jsonify({"error": "Request must be JSON"}), 400
@@ -55,12 +50,9 @@ def predict():
         
         #Scale the inputs
         input_df[num_cols] = scaler.transform(input_df[num_cols])
-
-
         input_df = input_df[cols]
         print("This is input df")
-        print(input_df)     
-
+        print(input_df)    
         # Predict
         prediction = model1.predict(input_df)
         #print(prediction)
