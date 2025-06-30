@@ -17,3 +17,8 @@ machineLearning/model.pkl
 machineLearning/rmodel.pkl
 machineLearning/StandardScaler_selected.pkl
 machineLearning/Final_data.csv
+contracts/.solcx-lock-0.8.15
+contracts/oyente/
+contracts/slither-output.json
+machineLearning/analysis.ipynb
+machineLearning/myTest.csv
