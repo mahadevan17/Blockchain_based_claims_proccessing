@@ -82,12 +82,10 @@ contract Approval {
     uint public MedicationInvoice_ID;
     uint public DrugTotalCost;
     uint public PaidAmount;
-
     // Constructor
     constructor(address _reg_contract_address) {
         reg = Registration(_reg_contract_address);
     }
-
     // Modifiers
     modifier OnlyPhysician() {
         require(reg.physicians(msg.sender), "Only Physician can create Prescription");
@@ -111,9 +109,7 @@ contract Approval {
 
     // Events
     event PrescriptionCreated(address indexed Physician, uint PatientID, bytes32 _IPFShash);
-
-    event PharmacyApprovalStateChanged(address indexed pharmacy, uint status);
-    
+    event PharmacyApprovalStateChanged(address indexed pharmacy, uint status);    
     event PharmacySelected(address indexed patient, uint selectionCount);
     event RequestInsuranceApprovalStateChanged(address _pharmacy, uint PatientID);
     event RequestApproval(address Insurance_Company , uint insuranceApprovalstatus,  uint PatientID, address _Pharmacyaddress);
@@ -124,7 +120,8 @@ contract Approval {
     event ClaimPaid (address Insurance_Company, uint medicationinvoiceID);
 
     // Prescription creation (Physician only)
-    function PrescriptionCreation(uint Patient_Id, uint Drug1CRN_, uint Drug2CRN_, uint Drug3CRN_, string memory IPFShash_) external OnlyPhysician {
+    function PrescriptionCreation(uint Patient_Id, uint Drug1CRN_, uint Drug2CRN_, uint Drug3CRN_, 
+        string memory IPFShash_) external OnlyPhysician{
         Patient_ID = Patient_Id;
         Drug1CRN = Drug1CRN_;
         Drug2CRN = Drug2CRN_;

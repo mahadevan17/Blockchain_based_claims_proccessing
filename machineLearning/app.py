@@ -30,10 +30,10 @@ def predict():
         return jsonify({"error": "No features provided"}), 400
 
     try:
-        for i in range(5,13):
-            features[i] = int(features[i])
+        #for i in range(5,13):
+        #    features[i] = int(features[i])       
 
-        print(features)
+        #print(features)
         cols=["BeneID","ClaimID","Provider","AttendingPhysician","OtherPhysician","ClmDiagnosisCode_1","ClmDiagnosisCode_2","State","County","InscClaimAmtReimbursed","OPAnnualReimbursementAmt","OPAnnualDeductibleAmt","Age"]
         # Create DataFrame from input
         input_df = pd.DataFrame([features], columns=cols)
@@ -51,8 +51,8 @@ def predict():
         #Scale the inputs
         input_df[num_cols] = scaler.transform(input_df[num_cols])
         input_df = input_df[cols]
-        print("This is input df")
-        print(input_df)    
+        #print("This is input df")
+        #print(input_df)    
         # Predict
         prediction = model1.predict(input_df)
         #print(prediction)
@@ -63,5 +63,5 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
 
