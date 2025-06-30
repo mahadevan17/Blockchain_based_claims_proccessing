@@ -1,10 +1,6 @@
 <h2>👋 Greetings</h2>
 
-<p>This project focuses on <b>detecting fraudulent patient insurance claims</b> using <b>Machine Learning algorithms</b>, while <b>securely storing</b> them on the <b>blockchain</b>.</p>
-
-<p>Traditional insurance claim systems often suffer from <b>loopholes, corruption, and security vulnerabilities</b>. Our system aims to provide a secure, scalable, and transparent solution that is resistant to <b>fraud, tampering, and cyberattacks</b>, while maintaining <b>high reliability and availability</b> under load.</p>
-
-<p>Compared to existing solutions, this project stands out for its strong focus on <b>transparency</b>, <b>scalability</b>, and <b>protection of patient privacy</b>.</p>
+<h2>📌 Project Overview</h2> <p> This project presents a <b>blockchain-based framework</b> for automating health insurance claim processing—specifically for prescription drugs. Traditional systems suffer from delays, fraud, and high administrative costs due to centralized databases and manual workflows. Our solution leverages <b>Ethereum smart contracts</b> to establish trust, transparency, and automation among key stakeholders like patients, doctors, pharmacies, and insurance providers. </p> <p> To handle large medical data efficiently, the system integrates the <b>InterPlanetary File System (IPFS)</b>, enabling secure, decentralized storage of prescription records. Each prescription is stored off-chain in IPFS, while its hash is immutably recorded on-chain to ensure data integrity. </p> <p> A key innovation is the integration of <b>Machine Learning</b>, which helps optimize smart contract execution by dynamically managing resource usage. This reduces gas costs, improves system responsiveness, and enhances scalability. </p> <p> For ease of use, the project also features a clean <b>Graphical User Interface (GUI)</b> that allows users to enter and view prescription and claim information, delivering a transparent and seamless experience. </p> <p> In summary, this system combines the strengths of <b>Blockchain, IPFS, and Machine Learning</b> to create a robust, secure, and scalable solution that addresses real-world inefficiencies in the health insurance ecosystem. </p>
 
 <hr>
 
@@ -15,7 +11,7 @@
   <li><a href="https://nodejs.org/">Node.js</a></li>
   <li><a href="https://www.npmjs.com/">npm</a></li>
   <li><a href="https://hardhat.org/">Hardhat</a></li>
-  <li><a href="https://jupyter.org/">Jupyter Notebook</a></li>
+  <li><a href="https://jupyter.org/">Jupyter Notebook</a> (and other dependendices as required for machine learning algorithms)</li>
   <li><a href="https://www.python.org/">Python</a></li>
 </ul>
 
@@ -28,8 +24,8 @@
 
 <ol>
   <li><b>Clone the Repository</b><br>
-    <pre><code>git clone &lt;repository-url&gt;
-cd hardhatdeployment</code></pre>
+    <pre><code>git clone https://github.com/mahadevan17/Blockchain_based_claims_proccessing.git
+cd Blockchain_based_claims_proccessing</code></pre>
   </li>
 
   <li><b>Install Node.js Dependencies</b><br>
@@ -48,7 +44,7 @@ cd hardhatdeployment</code></pre>
   </li>
 
   <li><b>Start the ML Server</b><br>
-    <pre><code>python machinelearning/app.py</code></pre>
+    <pre><code>python machineLearning/app.py</code></pre>
     <p>Keep this terminal open and running.</p>
   </li>
 
